@@ -4892,6 +4892,7 @@ var flamegraph = function () {
   var searchSum = 0;
   var totalValue = 0;
   var maxDelta = 0;
+  var filter = null;
 
   var getName = function (d) {
     return d.data.n || d.data.name
@@ -5356,7 +5357,8 @@ var flamegraph = function () {
     const excluded = [];
     const compoundValue = !selfValue;
     let item = root.data;
-    if (item.hide) {
+    let included_by_filter = filter ? filter(root) : true;
+    if (item.hide || !included_by_filter) {
       root.value = 0;
       children = root.children;
       if (children) {
@@ -5377,7 +5379,8 @@ var flamegraph = function () {
         while (i--) {
           child = children[i];
           item = child.data;
-          if (item.hide) {
+          included_by_filter = filter ? filter(child) : true;
+          if (item.hide || !included_by_filter) {
             child.value = 0;
             grandChildren = child.children;
             if (grandChildren) {
@@ -5512,6 +5515,12 @@ var flamegraph = function () {
     return chart
   };
 
+  chart.filter = function (_) {
+    if (!arguments.length) { return filter }
+    filter = _;
+    return chart
+  };
+
   chart.inverted = function (_) {
     if (!arguments.length) { return inverted }
     inverted = _;
@@ -5593,6 +5602,10 @@ var flamegraph = function () {
       adoptNode(newRoot);
     });
     selection = selection.datum(newRoot);
+    update();
+  };
+
+  chart.refresh = function() {
     update();
   };
 

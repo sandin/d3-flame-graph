@@ -92,7 +92,7 @@
       .onClick(onClick)
       .differential(false)
       .elided(false)
-      .selfValue(false);
+      .selfValue(true);
 
 
     // Example on how to use custom tooltips using d3-tip.
@@ -132,6 +132,15 @@
           .datum(data)
           .call(flameGraph)
           .call(invokeFind);
+
+      flameGraph.filter(function(d) {
+        console.log("filter", d);
+        if ( d.name == "a/b/c2") {
+          //console.log("hide", d);
+          return false;
+        }
+        return true;
+      }).refresh();
     });
 
     document.getElementById("form").addEventListener("submit", function(event){
@@ -162,9 +171,11 @@
     }
 
     function onClick(d) {
-      console.info(`Clicked on ${d.data.name}, id: "${d.id}"`);
+      console.info(`Clicked on ${d.data.name}, id: "${d.id}"`, d, this);
       history.pushState({ id: d.id }, d.data.name, `#${d.id}`);
     }
+
+ ;
     </script>
   </body>
 </html>
